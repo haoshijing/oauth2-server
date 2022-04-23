@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.revengemission.sso</groupId>
     <artifactId>oauth2-server</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>0.0.4</version>
     <packaging>jar</packaging>
     <name>oauth2-server</name>
     <description>spring-security-oauth2 authorization server</description>
