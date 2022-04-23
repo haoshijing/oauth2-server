@@ -70,7 +70,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
             .authorizeRequests()
             .mvcMatchers("/favicon.ico", "/signIn", "/signUp", "/security_check", "/404", "/captcha/**", "/user/me", "/oauth/check_token", "/oauth/token","/oauth/authorize", "/.well-known/**").permitAll()
-            .mvcMatchers("/oauth/signUp").permitAll()
+            .mvcMatchers("/oauth/signUp","/auth/*").permitAll()
             .mvcMatchers("/management/**").hasAnyAuthority(RoleEnum.ROLE_SUPER.name())
             .anyRequest().authenticated()
             .and()
