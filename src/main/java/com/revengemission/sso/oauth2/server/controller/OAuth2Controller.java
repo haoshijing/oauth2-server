@@ -67,7 +67,7 @@ public class OAuth2Controller {
     }
 
     @PostMapping("/token")
-    public ResponseEntity<Map<String, Object>> getAccessToken(@RequestParam(value = "client_id", required = false) String client_id,
+    public ResponseEntity<Map<String, Object>> token(@RequestParam(value = "client_id", required = false) String client_id,
                                                               @RequestParam(value = "client_secret", required = false) String client_secret,
                                                               @RequestParam(value = "grant_type") String grant_type,
                                                               @RequestParam(value = "scope", required = false) String scope,
@@ -120,7 +120,7 @@ public class OAuth2Controller {
     }
 
     @GetMapping("/authorize")
-    public String getAccessToken(ModelMap model,
+    public String authorize(ModelMap model,
                                  Authentication authentication,
                                  @RequestHeader(name = "referer", required = false) String referer,
                                  @RequestParam(value = "client_id") String client_id,
