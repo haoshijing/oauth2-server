@@ -78,7 +78,7 @@ public class OAuth2Controller {
         String code = request.getParameter("code");
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        log.info("client_id = {},redirect_uri= {}",client_id,redirect_uri);
+        log.info("client_id = {},redirect_uri= {}, code = {}",client_id,redirect_uri , code);
         Map<String, Object> result = new HashMap<>(16);
         OauthClient client = oauthClientService.findByClientId(client_id);
         HttpHeaders headers = new HttpHeaders();
