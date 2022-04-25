@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +51,10 @@ public class OAuth2Controller {
     CacheManager cacheManager;
 
     private AuthenticationManager authenticationManager;
+
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
     private KeyPair keyPair;
     private String issuerUri;
 
@@ -145,6 +150,7 @@ public class OAuth2Controller {
 
         if ("1".equals(client.getAutoApprove())) {
             String uuid = UUID.randomUUID().toString().replace("-", "");
+            log.info("authorize code={}",uuid);
             cacheManager.getCache(CachesEnum.Oauth2AuthorizationCodeCache.name()).put(uuid, authentication);
             if (client.getWebServerRedirectUri().indexOf("?") > 0) {
                 return "redirect:" + client.getWebServerRedirectUri() + "&code=" + uuid + "&state=" + state;
