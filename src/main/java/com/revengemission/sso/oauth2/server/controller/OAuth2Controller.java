@@ -66,7 +66,7 @@ public class OAuth2Controller {
         authorizationCodeTokenGranter = new AuthorizationCodeTokenGranter(authenticationManager, cacheManager, keyPair, issuerUri);
     }
 
-    @PostMapping("/token")
+    @PostMapping(value={"/token","/refreshToken"})
     public ResponseEntity<Map<String, Object>> token(@RequestParam(value = "client_id", required = false) String client_id,
                                                               @RequestParam(value = "client_secret", required = false) String client_secret,
                                                               @RequestParam(value = "grant_type") String grant_type,
@@ -118,6 +118,8 @@ public class OAuth2Controller {
         return new ResponseEntity<>(
             result, headers, HttpStatus.OK);
     }
+
+
 
     @GetMapping("/authorize")
     public String authorize(ModelMap model,

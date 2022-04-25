@@ -41,6 +41,7 @@ public class AuthorizationCodeTokenGranter implements TokenGranter {
         result.put("status", 0);
 
         String authorizationCode = parameters.get("code");
+        String clientSecret = parameters.get("client_secret");
         String redirectUri = parameters.get("redirect_uri");
         String clientId = parameters.get("client_id");
         String scope = parameters.get("scope");
