@@ -3,6 +3,7 @@ package com.revengemission.sso.oauth2.server.controller;
 import com.revengemission.sso.oauth2.server.config.CachesEnum;
 import com.revengemission.sso.oauth2.server.domain.OauthClient;
 import com.revengemission.sso.oauth2.server.domain.ScopeDefinition;
+import com.revengemission.sso.oauth2.server.domain.UserInfo;
 import com.revengemission.sso.oauth2.server.service.OauthClientService;
 import com.revengemission.sso.oauth2.server.service.ScopeDefinitionService;
 import com.revengemission.sso.oauth2.server.token.AuthorizationCodeTokenGranter;
@@ -19,7 +20,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -32,10 +35,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.KeyPair;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
 @RequestMapping("/oauth")
@@ -150,7 +150,12 @@ public class OAuth2Controller {
 
         if ("1".equals(client.getAutoApprove())) {
             String uuid = UUID.randomUUID().toString().replace("-", "");
-            log.info("authorize code={}",uuid);
+            if(authentication == null){
+
+                UserInfo userInfo = new UserInfo(uuid,client_id,client_id,new ArrayList<>());
+                authentication = new UsernamePasswordAuthenticationToken(client_id,userInfo);
+                authentication.setAuthenticated(true);
+            }
             cacheManager.getCache(CachesEnum.Oauth2AuthorizationCodeCache.name()).put(uuid, authentication);
             if (client.getWebServerRedirectUri().indexOf("?") > 0) {
                 return "redirect:" + client.getWebServerRedirectUri() + "&code=" + uuid + "&state=" + state;
