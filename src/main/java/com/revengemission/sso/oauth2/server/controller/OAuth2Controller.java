@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.KeyPair;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -67,15 +68,17 @@ public class OAuth2Controller {
     }
 
     @PostMapping(value={"/token","/refreshToken"})
-    public ResponseEntity<Map<String, Object>> token(@RequestParam(value = "client_id", required = false) String client_id,
-                                                              @RequestParam(value = "client_secret", required = false) String client_secret,
-                                                              @RequestParam(value = "grant_type") String grant_type,
-                                                              @RequestParam(value = "scope", required = false) String scope,
-                                                              @RequestParam(value = "redirect_uri", required = false) String redirect_uri,
-                                                              @RequestParam(value = "refresh_token", required = false) String refresh_token,
-                                                              @RequestParam(value = "code", required = false) String code,
-                                                              @RequestParam(value = "username", required = false) String username,
-                                                              @RequestParam(value = "password", required = false) String password) {
+    public ResponseEntity<Map<String, Object>> token(HttpServletRequest request) {
+        String client_id = request.getParameter("client_id");
+        String client_secret = request.getParameter("client_secret");
+        String grant_type = request.getParameter("grant_type");
+        String scope = request.getParameter("scope");
+        String redirect_uri = request.getParameter("redirect_uri");
+        String refresh_token = request.getParameter("refresh_token");
+        String code = request.getParameter("code");
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        log.info("client_id = {},redirect_uri= {}",client_id,redirect_uri);
         Map<String, Object> result = new HashMap<>(16);
         OauthClient client = oauthClientService.findByClientId(client_id);
         HttpHeaders headers = new HttpHeaders();
