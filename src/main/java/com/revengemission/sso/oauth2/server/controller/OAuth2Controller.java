@@ -153,7 +153,7 @@ public class OAuth2Controller {
             if(authentication == null){
 
                 UserInfo userInfo = new UserInfo(uuid,client_id,client_id,new ArrayList<>());
-                authentication = new UsernamePasswordAuthenticationToken(client_id,userInfo);
+                authentication = new UsernamePasswordAuthenticationToken(userInfo,client_id);
             }
             cacheManager.getCache(CachesEnum.Oauth2AuthorizationCodeCache.name()).put(uuid, authentication);
             if (client.getWebServerRedirectUri().indexOf("?") > 0) {
