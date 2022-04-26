@@ -72,7 +72,7 @@ public class OAuth2Controller {
         authorizationCodeTokenGranter = new AuthorizationCodeTokenGranter(authenticationManager, cacheManager, keyPair, issuerUri);
     }
 
-    @PostMapping(value={"/token","/refreshToken"})
+    @PostMapping(value={"/token"})
     public ResponseEntity<Map<String, Object>> token(HttpServletRequest request) {
         String client_id = request.getParameter("client_id");
         String client_secret = request.getParameter("client_secret");

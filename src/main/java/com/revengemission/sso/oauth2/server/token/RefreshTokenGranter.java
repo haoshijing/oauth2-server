@@ -2,6 +2,7 @@ package com.revengemission.sso.oauth2.server.token;
 
 import com.revengemission.sso.oauth2.server.domain.OauthClient;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,12 @@ public class RefreshTokenGranter implements TokenGranter {
         }
 
         try {
-            Claims claims = Jwts.parserBuilder().setSigningKey(keyPair.getPublic()).build().parseClaimsJws(refreshToken).getBody();
+            Claims claims =null;
+            try {
+                claims =  Jwts.parserBuilder().setSigningKey(keyPair.getPublic()).build().parseClaimsJws(refreshToken).getBody();
+            }catch (ExpiredJwtException e){
+                claims = e.getClaims();
+            }
             Date now = new Date();
             Date tokenExpiration = Date.from(LocalDateTime.now().plusSeconds(client.getAccessTokenValidity()).atZone(ZoneId.systemDefault()).toInstant());
             Date refreshTokenExpiration = Date.from(LocalDateTime.now().plusSeconds(client.getRefreshTokenValidity()).atZone(ZoneId.systemDefault()).toInstant());
