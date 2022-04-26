@@ -49,6 +49,7 @@ public class RefreshTokenGranter implements TokenGranter {
             }catch (ExpiredJwtException e){
                 claims = e.getClaims();
             }
+            log.info("RefreshTokenGranter claims =  {}" ,claims);
             Date now = new Date();
             Date tokenExpiration = Date.from(LocalDateTime.now().plusSeconds(client.getAccessTokenValidity()).atZone(ZoneId.systemDefault()).toInstant());
             Date refreshTokenExpiration = Date.from(LocalDateTime.now().plusSeconds(client.getRefreshTokenValidity()).atZone(ZoneId.systemDefault()).toInstant());
