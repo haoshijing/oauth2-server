@@ -5,8 +5,10 @@ import com.revengemission.sso.oauth2.server.domain.OAuth2Exception;
 import com.revengemission.sso.oauth2.server.domain.OauthClient;
 import com.revengemission.sso.oauth2.server.domain.UserInfo;
 import io.jsonwebtoken.Jwts;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -27,11 +29,14 @@ public class AuthorizationCodeTokenGranter implements TokenGranter {
     String issuer;
     CacheManager cacheManager;
 
-    public AuthorizationCodeTokenGranter(AuthenticationManager authenticationManager, CacheManager cacheManager, KeyPair keyPair, String issuer) {
+    private StringRedisTemplate stringRedisTemplate;
+
+    public AuthorizationCodeTokenGranter(AuthenticationManager authenticationManager, CacheManager cacheManager, KeyPair keyPair, String issuer, StringRedisTemplate stringRedisTemplate) {
         this.authenticationManager = authenticationManager;
         this.cacheManager = cacheManager;
         this.keyPair = keyPair;
         this.issuer = issuer;
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     @Override
@@ -58,12 +63,13 @@ public class AuthorizationCodeTokenGranter implements TokenGranter {
             Date tokenExpiration = Date.from(LocalDateTime.now().plusSeconds(client.getAccessTokenValidity()).atZone(ZoneId.systemDefault()).toInstant());
             Date refreshTokenExpiration = Date.from(LocalDateTime.now().plusSeconds(client.getRefreshTokenValidity()).atZone(ZoneId.systemDefault()).toInstant());
 
+           String phone =  stringRedisTemplate.opsForValue().get("USER:CODE."+authorizationCode);
 
             String tokenId = UUID.randomUUID().toString();
             String accessToken = Jwts.builder()
                 .setHeaderParam("alg", "HS256")
                 .setHeaderParam("typ", "JWT")
-                .claim("accountOpenCode", userInfo.getAccountOpenCode())
+                .claim("accountOpenCode", phone)
                 .setIssuer(issuer)
                 .setSubject(userInfo.getUsername())
                 .setAudience(clientId)
@@ -78,7 +84,7 @@ public class AuthorizationCodeTokenGranter implements TokenGranter {
             String refreshToken = Jwts.builder()
                 .setHeaderParam("alg", "HS256")
                 .setHeaderParam("typ", "JWT")
-                .claim("accountOpenCode", userInfo.getAccountOpenCode())
+                .claim("accountOpenCode", phone)
                 .claim("jti", tokenId)
                 .setIssuer(issuer)
                 .setSubject(userInfo.getUsername())

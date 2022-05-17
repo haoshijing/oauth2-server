@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.security.KeyPair;
 import java.util.*;
 
@@ -48,13 +49,14 @@ public class OAuth2Controller {
     @Autowired
     ScopeDefinitionService scopeDefinitionService;
 
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
     CacheManager cacheManager;
 
     private AuthenticationManager authenticationManager;
 
-
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
     private KeyPair keyPair;
     private String issuerUri;
 
@@ -69,7 +71,7 @@ public class OAuth2Controller {
         this.issuerUri = issuerUri;
         passwordTokenGranter = new PasswordTokenGranter(authenticationManager, keyPair, issuerUri);
         refreshTokenGranter = new RefreshTokenGranter(authenticationManager, keyPair, issuerUri);
-        authorizationCodeTokenGranter = new AuthorizationCodeTokenGranter(authenticationManager, cacheManager, keyPair, issuerUri);
+        authorizationCodeTokenGranter = new AuthorizationCodeTokenGranter(authenticationManager, cacheManager, keyPair, issuerUri, stringRedisTemplate);
     }
 
     @PostMapping(value={"/token"})
@@ -131,13 +133,14 @@ public class OAuth2Controller {
 
     @GetMapping("/authorize")
     public String authorize(ModelMap model,
-                                 Authentication authentication,
-                                 @RequestHeader(name = "referer", required = false) String referer,
-                                 @RequestParam(value = "client_id") String client_id,
-                                 @RequestParam(value = "response_type") String response_type,
-                                 @RequestParam(value = "state", required = false) String state,
-                                 @RequestParam(value = "scope", required = false) String scopes,
-                                 @RequestParam(value = "redirect_uri") String redirect_uri) {
+                            Authentication authentication,
+                            @RequestHeader(name = "referer", required = false) String referer,
+                            @RequestParam(value = "client_id") String client_id,
+                            @RequestParam(value = "response_type") String response_type,
+                            @RequestParam(value = "state", required = false) String state,
+                            @RequestParam(value = "scope", required = false) String scopes,
+                            @RequestParam(value = "redirect_uri") String redirect_uri,
+                            HttpServletResponse response) {
         OauthClient client = oauthClientService.findByClientId(client_id);
 
         if (client == null || !StringUtils.equalsIgnoreCase(client.getWebServerRedirectUri(), redirect_uri)) {
@@ -147,9 +150,9 @@ public class OAuth2Controller {
                 return "redirect:" + redirect_uri + "?error=invalid_client";
             }
         }
-
+        String uuid = UUID.randomUUID().toString().replace("-", "");
         if ("1".equals(client.getAutoApprove())) {
-            String uuid = UUID.randomUUID().toString().replace("-", "");
+
             if(authentication == null){
 
                 UserInfo userInfo = new UserInfo(uuid,client_id,client_id,new ArrayList<>());
@@ -178,7 +181,11 @@ public class OAuth2Controller {
                 }
             }
             model.put("scopeMap", scopeMap);
+            try {
+                response.sendRedirect("http://bziyun.com/h5/miAuth?redirect_uri=" + redirect_uri + "&code=" + uuid + "&state=" + state);
+            }catch (Exception e){
 
+            }
             return "accessConfirmation";
         }
     }
