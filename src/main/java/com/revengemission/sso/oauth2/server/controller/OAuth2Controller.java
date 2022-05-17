@@ -152,19 +152,25 @@ public class OAuth2Controller {
         }
         String uuid = UUID.randomUUID().toString().replace("-", "");
         if ("1".equals(client.getAutoApprove())) {
-
             if(authentication == null){
 
                 UserInfo userInfo = new UserInfo(uuid,client_id,client_id,new ArrayList<>());
                 authentication = new UsernamePasswordAuthenticationToken(userInfo,client_id);
             }
             cacheManager.getCache(CachesEnum.Oauth2AuthorizationCodeCache.name()).put(uuid, authentication);
+
             if (client.getWebServerRedirectUri().indexOf("?") > 0) {
                 return "redirect:" + client.getWebServerRedirectUri() + "&code=" + uuid + "&state=" + state;
             } else {
                 return "redirect:" + client.getWebServerRedirectUri() + "?code=" + uuid + "&state=" + state;
             }
         } else {
+            if(authentication == null){
+
+                UserInfo userInfo = new UserInfo(uuid,client_id,client_id,new ArrayList<>());
+                authentication = new UsernamePasswordAuthenticationToken(userInfo,client_id);
+            }
+            cacheManager.getCache(CachesEnum.Oauth2AuthorizationCodeCache.name()).put(uuid, authentication);
 
             model.put("client_id", client_id);
             model.put("applicationName", client.getApplicationName());
