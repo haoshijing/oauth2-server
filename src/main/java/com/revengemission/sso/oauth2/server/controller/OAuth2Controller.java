@@ -50,9 +50,6 @@ public class OAuth2Controller {
     ScopeDefinitionService scopeDefinitionService;
 
 
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
-
     CacheManager cacheManager;
 
     private AuthenticationManager authenticationManager;
@@ -64,7 +61,7 @@ public class OAuth2Controller {
     RefreshTokenGranter refreshTokenGranter;
     AuthorizationCodeTokenGranter authorizationCodeTokenGranter;
 
-    public OAuth2Controller(AuthenticationManager authenticationManager, KeyPair keyPair, CacheManager cacheManager, @Value("${oauth2.issuer-uri:http://localhost:10380}") String issuerUri) {
+    public OAuth2Controller(AuthenticationManager authenticationManager, KeyPair keyPair, CacheManager cacheManager, @Value("${oauth2.issuer-uri:http://localhost:10380}") String issuerUri,StringRedisTemplate stringRedisTemplate) {
         this.authenticationManager = authenticationManager;
         this.keyPair = keyPair;
         this.cacheManager = cacheManager;

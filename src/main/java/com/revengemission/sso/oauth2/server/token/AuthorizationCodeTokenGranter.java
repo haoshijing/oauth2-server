@@ -5,6 +5,7 @@ import com.revengemission.sso.oauth2.server.domain.OAuth2Exception;
 import com.revengemission.sso.oauth2.server.domain.OauthClient;
 import com.revengemission.sso.oauth2.server.domain.UserInfo;
 import io.jsonwebtoken.Jwts;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -22,6 +23,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class AuthorizationCodeTokenGranter implements TokenGranter {
     private static final String GRANT_TYPE = "authorization_code";
     private final AuthenticationManager authenticationManager;
@@ -63,7 +65,8 @@ public class AuthorizationCodeTokenGranter implements TokenGranter {
             Date tokenExpiration = Date.from(LocalDateTime.now().plusSeconds(client.getAccessTokenValidity()).atZone(ZoneId.systemDefault()).toInstant());
             Date refreshTokenExpiration = Date.from(LocalDateTime.now().plusSeconds(client.getRefreshTokenValidity()).atZone(ZoneId.systemDefault()).toInstant());
 
-           String phone =  stringRedisTemplate.opsForValue().get("USER:CODE."+authorizationCode);
+            log.info("stringRedisTemplate = {}", stringRedisTemplate == null);
+            String phone = stringRedisTemplate.opsForValue().get("USER:CODE." + authorizationCode);
 
             String tokenId = UUID.randomUUID().toString();
             String accessToken = Jwts.builder()
