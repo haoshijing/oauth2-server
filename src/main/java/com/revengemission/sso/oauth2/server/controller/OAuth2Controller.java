@@ -230,7 +230,8 @@ public class OAuth2Controller {
     public Map<String, Object> checkToken(@RequestParam(value = "access_token") String access_token) {
         Map<String, Object> result = new HashMap<>(16);
         try {
-            Jwts.parserBuilder().setSigningKey(keyPair.getPublic()).build().parseClaimsJws(access_token).getBody();
+          Object object =Jwts.parserBuilder().setSigningKey(keyPair.getPublic()).build().parseClaimsJws(access_token).getBody();
+          log.info("object = {}",object);
             result.put("status", 1);
         } catch (Exception e) {
             result.put("status", 0);
