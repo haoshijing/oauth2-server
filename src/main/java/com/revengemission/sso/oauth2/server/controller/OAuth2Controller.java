@@ -9,6 +9,7 @@ import com.revengemission.sso.oauth2.server.service.ScopeDefinitionService;
 import com.revengemission.sso.oauth2.server.token.AuthorizationCodeTokenGranter;
 import com.revengemission.sso.oauth2.server.token.PasswordTokenGranter;
 import com.revengemission.sso.oauth2.server.token.RefreshTokenGranter;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -242,5 +243,18 @@ public class OAuth2Controller {
         }
         return result;
     }
+
+    @ResponseBody
+    @PostMapping("/getAccount")
+    public String getAccount(@RequestParam(value = "access_token") String access_token){
+        try {
+            Claims claims =Jwts.parserBuilder().setSigningKey(keyPair.getPublic()).build().parseClaimsJws(access_token).getBody();
+            return claims.get("accountOpenCode",String.class);
+        } catch (Exception e) {
+
+        }
+        return "";
+    }
+
 
 }

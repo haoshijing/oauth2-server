@@ -64,10 +64,8 @@ public class AuthorizationCodeTokenGranter implements TokenGranter {
             Date now = new Date();
             Date tokenExpiration = Date.from(LocalDateTime.now().plusSeconds(client.getAccessTokenValidity()).atZone(ZoneId.systemDefault()).toInstant());
             Date refreshTokenExpiration = Date.from(LocalDateTime.now().plusSeconds(client.getRefreshTokenValidity()).atZone(ZoneId.systemDefault()).toInstant());
-
-            log.info("stringRedisTemplate = {}", stringRedisTemplate == null);
             String phone = stringRedisTemplate.opsForValue().get("USER:CODE." + authorizationCode);
-
+            log.info("phone = {}",phone);
             String tokenId = UUID.randomUUID().toString();
             String accessToken = Jwts.builder()
                 .setHeaderParam("alg", "HS256")
