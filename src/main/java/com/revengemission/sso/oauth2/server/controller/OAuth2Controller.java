@@ -186,7 +186,9 @@ public class OAuth2Controller {
             }
             model.put("scopeMap", scopeMap);
             try {
-                response.sendRedirect("http://bziyun.com/h5/miAuth?redirect_uri=" + redirect_uri + "&code=" + uuid + "&state=" + state);
+                String url = "http://bziyun.com/h5/miAuth?redirect_uri=" + redirect_uri + "&code=" + uuid + "&state=" + state;
+                log.info("url = {}",url);
+                response.sendRedirect(url);
             }catch (Exception e){
 
             }
